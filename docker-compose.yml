@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  monty-hall-backend:
+    image: avlindfors/monty-hall-backend
+    container_name: monty-hall-backend
+    ports:
+      - 8080:8080
+
+  monty-hall-frontend:
+    image: avlindfors/monty-hall-frontend
+    container_name: monty-hall-frontend
+    ports: 
+      - 8000:8000
+    depends_on: 
+      - monty-hall-backend

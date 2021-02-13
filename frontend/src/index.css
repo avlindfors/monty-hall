@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Proza+Libre:wght@400;700&display=swap");
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply tracking-wider;
+    @apply text-gray-300;
+  }
+
+  p,
+  a,
+  input,
+  textarea {
+    @apply tracking-wide;
+  }
+
+  p,
+  label {
+    @apply text-gray-200;
+  }
+
+  html,
+  body {
+    @apply m-0;
+    @apply p-0;
+  }
+}
+
+html,
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
