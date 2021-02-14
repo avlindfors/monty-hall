@@ -1,29 +1,28 @@
 package com.avlindfors.montyhall.service;
 
+import static com.avlindfors.montyhall.domain.api.Strategy.STICK;
+import static com.avlindfors.montyhall.domain.game.Result.WIN;
+
 import com.avlindfors.montyhall.domain.api.SimulationRequest;
 import com.avlindfors.montyhall.domain.api.SimulationResponse;
-import com.avlindfors.montyhall.domain.game.Door;
+import com.avlindfors.montyhall.domain.game.Game;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 @Service
 public class SimulationService {
 
-  private static final Logger log = LoggerFactory.getLogger(SimulationService.class);
-
-  private final GameService gameService;
+  private final GameManagerService gameManagerService;
 
   @Autowired
-  public SimulationService(GameService gameService) {
-    this.gameService = gameService;
+  public SimulationService(GameManagerService gameManagerService) {
+    this.gameManagerService = gameManagerService;
   }
 
   /**
-   * Simulerar angivet antal spelomgångar och räknar utfallen.
+   * Simulates given number of rounds och counts results.
    */
   public SimulationResponse simulate(SimulationRequest request) {
     var numberOfSimulations = request.getNumberOfSimulations();
@@ -32,26 +31,30 @@ public class SimulationService {
     int totalWins = 0;
 
     for (int i = 0; i < numberOfSimulations; i++) {
-      Door[] doors = gameService.initGame();
-      //log.info("Doors are: {} with length: {}", (Object[]) doors, doors.length);
-      int initialDoorPick = gameService.pickDoor(doors);
-      //log.info("initial pick is: {}", initialDoorPick);
-      int openedDoor = gameService.openOneDoor(initialDoorPick, doors);
-      //log.info("opened door is: {}", openedDoor);
-      boolean isSuccess = gameService.endGame(initialDoorPick, openedDoor, doors, strategy);
-      //log.info("Game: " + i + " was won: {}", isSuccess);
-      if (isSuccess) {
+      // Start a new game
+      Game game = new Game(strategy);
+      gameManagerService.startGame(game);
+      // Pick your door
+      gameManagerService.pickADoor(game);
+      // End early if strategy is to STICK
+      if (strategy.equals(STICK)) {
+        if (game.isCurrentPickCorrect()) {
+          totalWins++;
+        }
+        continue;
+      }
+      // Reveal prize behind one door
+      gameManagerService.openOneDoor(game);
+      // Determine win condition
+      gameManagerService.endGame(game);
+      if (game.getGameResult().equals(WIN)) {
         totalWins++;
       }
     }
 
     return SimulationResponse.newBuilder()
-        .withTotalSimulations(request.getNumberOfSimulations())
+        .withTotalSimulations(numberOfSimulations)
         .withTotalWins(totalWins)
         .build();
-  }
-
-  private int getRandomCarStartionPosition() {
-    return ThreadLocalRandom.current().nextInt(0, 3);
   }
 }

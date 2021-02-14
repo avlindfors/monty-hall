@@ -1,5 +1,6 @@
 package com.avlindfors.montyhall.controller;
 
+import static com.avlindfors.montyhall.domain.api.Strategy.STICK;
 import static com.avlindfors.montyhall.domain.api.Strategy.SWAP;
 import static com.avlindfors.montyhall.util.SimulationTestUtil.createRequest;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,8 +34,17 @@ public class SimulationControllerIntegrationTest {
   private ObjectMapper objectMapper;
 
   @Test
-  public void canMakeRequestedNumberOfSimulations() throws Exception {
+  public void canMakeRequestedNumberOfSimulationsWithSwap() throws Exception {
     var request = createRequest(10, SWAP);
+    var response = makeCall(request);
+
+    assertThat(response.getTotalSimulations()).isEqualTo(10);
+    assertThat(response.getTotalWins()).isBetween(0, 10);
+  }
+
+  @Test
+  public void canMakeRequestedNumberOfSimulationsWithStick() throws Exception {
+    var request = createRequest(10, STICK);
     var response = makeCall(request);
 
     assertThat(response.getTotalSimulations()).isEqualTo(10);

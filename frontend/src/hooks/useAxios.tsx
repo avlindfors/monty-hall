@@ -27,7 +27,7 @@ const BASE_URL = isProduction ? HOST_PORT : "";
 
 const axiosConfig = axios.create({
   baseURL: BASE_URL,
-  timeout: 5000,
+  timeout: 10000,
   timeoutErrorMessage:
     "Could not connect to server before timeout. Please try again.",
 });
@@ -68,9 +68,11 @@ function useAxios({
             errorCode: error.code,
             description: error.message,
           };
+          console.error(errorObject)
           setError(errorObject);
         } else if (error.response !== undefined) {
           const errorObject = error.response?.data as ErrorObject;
+          console.error(errorObject)
           setError(errorObject);
         } else {
           const errorObject: ErrorObject = {

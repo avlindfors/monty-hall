@@ -23,6 +23,9 @@ public class SimulationController {
     this.service = service;
   }
 
+  /**
+   * Simulates given rounds of the Monty Hall paradox with provided strategy.
+   */
   @PostMapping(value = "/simulate",
       produces = APPLICATION_JSON_VALUE,
       consumes = APPLICATION_JSON_VALUE)
