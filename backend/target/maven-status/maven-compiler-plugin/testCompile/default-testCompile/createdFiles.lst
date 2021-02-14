@@ -1,1 +1,4 @@
 com/avlindfors/montyhall/MontyHallApplicationTests.class
+com/avlindfors/montyhall/controller/SimulationControllerTest.class
+com/avlindfors/montyhall/util/SimulationTestUtil.class
+com/avlindfors/montyhall/controller/SimulationControllerIntegrationTest.class

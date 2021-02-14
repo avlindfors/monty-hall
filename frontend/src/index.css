@@ -3,8 +3,13 @@
 @tailwind utilities;
 
 @import url("https://fonts.googleapis.com/css2?family=Proza+Libre:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap");
 
 @layer base {
+  * {
+    @apply text-gray-700;
+  }
+
   h1,
   h2,
   h3,
@@ -12,19 +17,16 @@
   h5,
   h6 {
     @apply tracking-wider;
-    @apply text-gray-300;
+    @apply font-header;
   }
 
   p,
   a,
+  button,
   input,
   textarea {
     @apply tracking-wide;
-  }
-
-  p,
-  label {
-    @apply text-gray-200;
+    @apply font-body;
   }
 
   html,
@@ -34,8 +36,32 @@
   }
 }
 
-html,
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer components {
+  .submit-button {
+    @apply w-full bg-gray-800 disabled:opacity-70 transition-opacity rounded text-gray-200 uppercase font-bold h-16 cursor-pointer disabled:cursor-not-allowed;
+  }
+
+  .hidden-input {
+    @apply h-0 hidden;
+  }
+
+  .hollow-checkbox {
+    @apply transition-all flex justify-center items-center bg-transparent cursor-pointer border-2 border-gray-200 rounded h-16 mb-4 sm:mb-5;
+  }
+
+  .underlined-input {
+    @apply rounded-none py-2 bg-transparent border-0 border-b-2 border-gray-700 focus:border-purple-500 text-lg outline-none ring-0 w-full text-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-4;
+  }
+
+  .body-text {
+    @apply text-gray-700 text-base sm:text-lg mb-2;
+  }
+
+  .body-header {
+    @apply text-lg sm:text-2xl font-bold text-gray-800;
+  }
+
+  .body-header-mb {
+    @apply body-header mb-3 sm:mb-4;
+  }
 }

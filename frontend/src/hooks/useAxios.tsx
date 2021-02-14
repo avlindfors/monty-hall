@@ -15,11 +15,15 @@ interface AxiosRequestProps {
   onResponse?: (response: any | undefined) => void;
   onError?: (error: any | undefined) => void;
   initialLoadingState?: boolean;
+  overrideBaseUrl?: boolean;
 }
 
 const API_HOST = process.env.REACT_APP_API_HOST as string;
 const API_PORT = process.env.REACT_APP_API_PORT as string;
-const BASE_URL = `${API_HOST}:${API_PORT}`;
+const HOST_PORT = `${API_HOST}:${API_PORT}`;
+// use CRA proxy
+const isProduction: boolean = process.env.NODE_ENV === "production";
+const BASE_URL = isProduction ? HOST_PORT : "";
 
 const axiosConfig = axios.create({
   baseURL: BASE_URL,
@@ -34,6 +38,7 @@ function useAxios({
   initialLoadingState = false,
   onResponse,
   onError,
+  overrideBaseUrl,
 }: AxiosRequestProps): UseAxiosType {
   const [isLoading, setIsLoading] = useState<boolean>(initialLoadingState);
   const [error, setError] = useState<ErrorObject | undefined>(undefined);
@@ -44,6 +49,7 @@ function useAxios({
     setError(undefined);
     axiosConfig
       .request({
+        baseURL: overrideBaseUrl ? HOST_PORT : BASE_URL,
         url: url,
         method: method,
         data: data,

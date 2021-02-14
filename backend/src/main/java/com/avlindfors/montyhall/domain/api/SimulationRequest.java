@@ -31,7 +31,7 @@ public class SimulationRequest {
     return stickOrSwapStrategy;
   }
 
-  public Builder newBuilder() {
+  public static Builder newBuilder() {
     return new Builder();
   }
 

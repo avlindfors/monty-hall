@@ -5,6 +5,7 @@ import com.avlindfors.montyhall.domain.api.SimulationResponse;
 import com.avlindfors.montyhall.domain.game.Door;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -16,6 +17,7 @@ public class SimulationService {
 
   private final GameService gameService;
 
+  @Autowired
   public SimulationService(GameService gameService) {
     this.gameService = gameService;
   }
@@ -31,13 +33,13 @@ public class SimulationService {
 
     for (int i = 0; i < numberOfSimulations; i++) {
       Door[] doors = gameService.initGame();
-      log.info("Doors are: {} with length: {}", (Object[]) doors, doors.length);
+      //log.info("Doors are: {} with length: {}", (Object[]) doors, doors.length);
       int initialDoorPick = gameService.pickDoor(doors);
-      log.info("initial pick is: {}", initialDoorPick);
+      //log.info("initial pick is: {}", initialDoorPick);
       int openedDoor = gameService.openOneDoor(initialDoorPick, doors);
-      log.info("opened door is: {}", openedDoor);
+      //log.info("opened door is: {}", openedDoor);
       boolean isSuccess = gameService.endGame(initialDoorPick, openedDoor, doors, strategy);
-      log.info("Game: " + i + " was won: {}", isSuccess);
+      //log.info("Game: " + i + " was won: {}", isSuccess);
       if (isSuccess) {
         totalWins++;
       }

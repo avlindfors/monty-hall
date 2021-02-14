@@ -1,10 +1,18 @@
 package com.avlindfors.montyhall.domain.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import javax.validation.constraints.NotNull;
+
+@JsonDeserialize(builder = SimulationResponse.Builder.class)
 public class SimulationResponse {
 
-  private final int totalSimulations;
+  @NotNull
+  private final Integer totalSimulations;
 
-  private final int totalWins;
+  @NotNull
+  private final Integer totalWins;
 
   private SimulationResponse(Builder builder) {
     totalSimulations = builder.totalSimulations;
@@ -23,6 +31,7 @@ public class SimulationResponse {
     return totalWins;
   }
 
+  @JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
     private int totalSimulations;
     private int totalWins;
