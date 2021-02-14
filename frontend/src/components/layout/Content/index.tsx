@@ -1,21 +1,17 @@
-import React, { SyntheticEvent, useState } from "react";
-import classnames from "classnames";
-
-import BodyHeader from "../../style/BodyHeader";
-import BodyText from "../../style/BodyText";
-import { type } from "os";
-import useAxios from "../../../hooks/useAxios";
-import HttpMethod from "../../../enums/HttpMethod";
+import React, { SyntheticEvent, useState } from 'react';
+import classnames from 'classnames';
+import useAxios from '../../../hooks/useAxios';
+import HttpMethod from '../../../enums/HttpMethod';
 
 enum Strategy {
-  STICK = "STICK",
-  SWAP = "SWAP",
+  STICK = 'STICK',
+  SWAP = 'SWAP',
 }
 
 enum NumberOfSimulations {
-  ONE = "ONE",
-  TEN_THOUSAND = "TEN_THOUSAND",
-  CUSTOM = "CUSTOM",
+  ONE = 'ONE',
+  TEN_THOUSAND = 'TEN_THOUSAND',
+  CUSTOM = 'CUSTOM',
 }
 
 interface SimulationResultType {
@@ -31,25 +27,22 @@ function Content() {
   >(undefined);
 
   const { response, isLoading, error, performCall } = useAxios({
-    url: "/api/v1/simulate",
+    url: '/api/v1/simulate',
     method: HttpMethod.POST,
     onResponse: setSimulationResult,
   });
 
-  const [
-    numberOfSimulationsType,
-    setNumberOfSimulationsType,
-  ] = useState<string>(NumberOfSimulations.CUSTOM);
+  const [numberOfSimulationsType, setNumberOfSimulationsType] = useState<
+    string
+  >(NumberOfSimulations.CUSTOM);
 
-  const [
-    fixedNumberOfSimulations,
-    setFixedNumberOfSimulations,
-  ] = useState<number>(1);
+  const [fixedNumberOfSimulations, setFixedNumberOfSimulations] = useState<
+    number
+  >(1);
 
-  const [
-    customNumberOfSimulations,
-    setCustomNumberOfSimulations,
-  ] = useState<number>(DEFAULT_CUSTOM_NUMBER_OF_SIMULATIONS);
+  const [customNumberOfSimulations, setCustomNumberOfSimulations] = useState<
+    any
+  >(DEFAULT_CUSTOM_NUMBER_OF_SIMULATIONS);
 
   const [strategy, setStrategy] = useState(Strategy.STICK);
 
@@ -87,14 +80,14 @@ function Content() {
   const handleChange = (event: SyntheticEvent) => {
     const target = event.target as HTMLInputElement;
     switch (target.type) {
-      case "radio":
+      case 'radio':
         handleRadioUpdate(target);
         break;
-      case "number":
+      case 'number':
         handleNumberUpdate(target);
         break;
       default:
-        throw new Error("Can not handle inputs of type: " + target.type);
+        throw new Error('Can not handle inputs of type: ' + target.type);
     }
   };
 
@@ -108,8 +101,7 @@ function Content() {
   };
 
   const handleNumberUpdate = (element: HTMLInputElement) => {
-    const value = element.value;
-    setCustomNumberOfSimulations(parseInt(element.value));
+    setCustomNumberOfSimulations(element.value);
   };
 
   const isFormValid: boolean =
@@ -123,8 +115,8 @@ function Content() {
     simulationResult.totalWins >= simulationResult.totalSimulations / 2;
 
   const buttonClass = (isSelected: boolean) => {
-    return classnames("hollow-checkbox", {
-      "border-gray-700": isSelected,
+    return classnames('hollow-checkbox', {
+      'border-gray-700': isSelected,
     });
   };
 
@@ -210,9 +202,9 @@ function Content() {
           <label>
             <span
               className={classnames(
-                "text-sm text-gray-600 inline-block transition-opacity",
+                'text-sm text-gray-600 inline-block transition-opacity',
                 {
-                  "opacity-50":
+                  'opacity-50':
                     numberOfSimulationsType !== NumberOfSimulations.CUSTOM,
                 }
               )}
@@ -227,6 +219,7 @@ function Content() {
               min={0}
               value={customNumberOfSimulations}
               placeholder=""
+              data-testid="customNumberOfSimulationsInput"
               onChange={handleChange}
             />
           </label>
@@ -266,7 +259,7 @@ function Content() {
           </label>
           <input
             type="submit"
-            value={!isLoading ? "Simulate" : "Simulating"}
+            value={!isLoading ? 'Simulate' : 'Simulating'}
             disabled={!isFormValid || isLoading}
             className="submit-button"
           ></input>

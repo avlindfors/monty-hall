@@ -5,7 +5,6 @@ import ServerStatusObject from "../../../api/ServerStatusObject";
 import HttpMethod from "../../../enums/HttpMethod";
 import ServerStatus from "../../../enums/ServerStatus";
 import useAxios from "../../../hooks/useAxios";
-import BodyHeader from "../../style/BodyHeader";
 
 function Header() {
   const [serverStatus, setServerStatus] = useState(ServerStatus.DOWN);
@@ -32,9 +31,7 @@ function Header() {
   }, []);
 
   const serverIsUp = serverStatus === ServerStatus.UP;
-  const serverStateClass = classNames({
-    "text-sm": true,
-    "font-bold": true,
+  const serverStateClass = classNames("text-sm font-bold", {
     "text-green-400": serverIsUp,
     "text-red-400": !serverIsUp,
   });
@@ -44,7 +41,7 @@ function Header() {
         <h1 className="body-header">Monty Hall Simulator</h1>
       </div>
       <div>
-        <p className={serverStateClass}>
+        <p className={serverStateClass} data-testid="server-status">
           Server is{" "}
           <span className="text-current">{serverIsUp ? "UP" : "DOWN"}</span>
         </p>

@@ -18,8 +18,8 @@ interface AxiosRequestProps {
   overrideBaseUrl?: boolean;
 }
 
-const API_HOST = process.env.REACT_APP_API_HOST as string;
-const API_PORT = process.env.REACT_APP_API_PORT as string;
+const API_HOST = process.env.REACT_APP_API_HOST || "http://localhost" as string;
+const API_PORT = process.env.REACT_APP_API_PORT || "8080" as string;
 const HOST_PORT = `${API_HOST}:${API_PORT}`;
 // use CRA proxy
 const isProduction: boolean = process.env.NODE_ENV === "production";
