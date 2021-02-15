@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import classNames from "classnames";
 
-import ServerStatusObject from "../../../api/ServerStatusObject";
-import HttpMethod from "../../../enums/HttpMethod";
-import ServerStatus from "../../../enums/ServerStatus";
-import useAxios from "../../../hooks/useAxios";
+import ServerStatusObject from "../../api/ServerStatusObject";
+import HttpMethod from "../../enums/HttpMethod";
+import ServerStatus from "../../enums/ServerStatus";
+import useAxios from "../../hooks/useAxios";
 
 function Header() {
   const [serverStatus, setServerStatus] = useState(ServerStatus.DOWN);

@@ -1,27 +1,49 @@
 import React, { SyntheticEvent, useState } from "react";
 import classnames from "classnames";
 
-import useAxios from "../../../hooks/useAxios";
-import HttpMethod from "../../../enums/HttpMethod";
-import ErrorObject from "../../../api/ErrorObject";
+import useAxios from "../../hooks/useAxios";
+import HttpMethod from "../../enums/HttpMethod";
+import ErrorObject from "../../api/ErrorObject";
 
-enum Strategy {
-  STICK = "STICK",
-  SWAP = "SWAP",
-}
-
-enum NumberOfSimulations {
-  ONE = "ONE",
-  TEN_THOUSAND = "TEN_THOUSAND",
-  CUSTOM = "CUSTOM",
-}
+type Strategy = "SWAP" | "STICK";
 
 interface SimulationResultType {
   totalSimulations: number;
   totalWins: number;
 }
 
+enum NumberOfSimulationsValue {
+  ONE = "ONE",
+  TEN_THOUSAND = "TEN_THOUSAND",
+  CUSTOM = "CUSTOM",
+}
+
+interface NumberOfSimulationsType {
+  type: string;
+  value: number | undefined;
+}
+
+const NUMBER_OF_SIMULATIONS: {
+  [index: string]: NumberOfSimulationsType;
+} = {
+  ONE: {
+    type: NumberOfSimulationsValue.ONE,
+    value: 1,
+  },
+  TEN_THOUSAND: {
+    type: NumberOfSimulationsValue.TEN_THOUSAND,
+    value: 10000,
+  },
+  CUSTOM: {
+    type: NumberOfSimulationsValue.CUSTOM,
+    value: undefined,
+  },
+};
+
 const DEFAULT_CUSTOM_NUMBER_OF_SIMULATIONS = 25000;
+
+const SWAP = "SWAP";
+const STICK = "STICK";
 
 const SIMULATIONS_RADIO = "numberOfSimulationsRadio";
 const SIMULATIONS_NUMBER = "numberOfSimulations";
@@ -36,34 +58,23 @@ function Content() {
     undefined
   );
 
-  const handleError = (errorObject: ErrorObject) => {
-    setPostError(errorObject);
-    setSimulationResult(undefined);
-  };
-
-  const [
-    numberOfSimulationsType,
-    setNumberOfSimulationsType,
-  ] = useState<string>(NumberOfSimulations.CUSTOM);
-
-  const [
-    fixedNumberOfSimulations,
-    setFixedNumberOfSimulations,
-  ] = useState<number>(1);
+  const [numberOfSimulationsType, setNumberOfSimulationsType] = useState<any>(
+    NUMBER_OF_SIMULATIONS.CUSTOM
+  );
 
   const [
     customNumberOfSimulations,
     setCustomNumberOfSimulations,
   ] = useState<any>(DEFAULT_CUSTOM_NUMBER_OF_SIMULATIONS);
 
-  const [strategy, setStrategy] = useState(Strategy.STICK);
+  const [strategy, setStrategy] = useState<Strategy>("STICK");
 
   const submitForm = (e: React.SyntheticEvent) => {
-    var actualNumberOfSimulations;
-    if (numberOfSimulationsType === NumberOfSimulations.CUSTOM) {
+    let actualNumberOfSimulations;
+    if (numberOfSimulationsType.type === NumberOfSimulationsValue.CUSTOM) {
       actualNumberOfSimulations = customNumberOfSimulations;
     } else {
-      actualNumberOfSimulations = getFixedNumberOfSimulations();
+      actualNumberOfSimulations = numberOfSimulationsType.value;
     }
     setPostError(undefined);
     performCall({
@@ -73,34 +84,25 @@ function Content() {
     e.preventDefault();
   };
 
-  const getFixedNumberOfSimulations = () => {
-    switch (numberOfSimulationsType) {
-      case NumberOfSimulations.ONE:
-        return 1;
-      case NumberOfSimulations.TEN_THOUSAND:
-        return 10000;
-      default:
-        return 1;
-    }
-  };
-
   const handleChange = (event: SyntheticEvent) => {
     const target = event.target as HTMLInputElement;
     const { name, value } = target;
     switch (name) {
       case SIMULATIONS_RADIO:
-        setNumberOfSimulationsType(value);
+        const actualType = NUMBER_OF_SIMULATIONS[value];
+        setNumberOfSimulationsType(actualType);
         break;
       case SIMULATIONS_NUMBER:
         setCustomNumberOfSimulations(parseInt(value));
         break;
       case STRATEGY_RADIO:
-        if (value === Strategy.STICK) {
-          setStrategy(Strategy.STICK);
-        } else {
-          setStrategy(Strategy.SWAP);
-        }
+        setStrategy(value as Strategy);
     }
+  };
+
+  const handleError = (errorObject: ErrorObject) => {
+    setPostError(errorObject);
+    setSimulationResult(undefined);
   };
 
   const { isLoading, performCall } = useAxios({
@@ -112,7 +114,7 @@ function Content() {
 
   const isFormInvalid: boolean =
     isNaN(customNumberOfSimulations) &&
-    numberOfSimulationsType === NumberOfSimulations.CUSTOM;
+    numberOfSimulationsType.type === NumberOfSimulationsValue.CUSTOM;
 
   const madeTheRightChoice =
     simulationResult !== undefined &&
@@ -142,7 +144,7 @@ function Content() {
               <label
                 htmlFor="1-simulationsRadio"
                 className={buttonClass(
-                  numberOfSimulationsType === NumberOfSimulations.ONE
+                  numberOfSimulationsType.type === NumberOfSimulationsValue.ONE
                 )}
               >
                 1
@@ -151,8 +153,11 @@ function Content() {
                   type="radio"
                   name={SIMULATIONS_RADIO}
                   id="1-simulationsRadio"
-                  value={NumberOfSimulations.ONE}
-                  checked={numberOfSimulationsType === NumberOfSimulations.ONE}
+                  value={NumberOfSimulationsValue.ONE}
+                  checked={
+                    numberOfSimulationsType.type ===
+                    NumberOfSimulationsValue.ONE
+                  }
                   onChange={handleChange}
                 />
               </label>
@@ -162,7 +167,8 @@ function Content() {
               <label
                 htmlFor="10000-simulationsRadio"
                 className={buttonClass(
-                  numberOfSimulationsType === NumberOfSimulations.TEN_THOUSAND
+                  numberOfSimulationsType.type ===
+                    NumberOfSimulationsValue.TEN_THOUSAND
                 )}
               >
                 10000
@@ -171,9 +177,10 @@ function Content() {
                   type="radio"
                   name={SIMULATIONS_RADIO}
                   id="10000-simulationsRadio"
-                  value={NumberOfSimulations.TEN_THOUSAND}
+                  value={NumberOfSimulationsValue.TEN_THOUSAND}
                   checked={
-                    numberOfSimulationsType === NumberOfSimulations.TEN_THOUSAND
+                    numberOfSimulationsType.type ===
+                    NumberOfSimulationsValue.TEN_THOUSAND
                   }
                   onChange={handleChange}
                 />
@@ -184,7 +191,8 @@ function Content() {
               <label
                 htmlFor="custom-simulationsRadio"
                 className={buttonClass(
-                  numberOfSimulationsType === NumberOfSimulations.CUSTOM
+                  numberOfSimulationsType.type ===
+                    NumberOfSimulationsValue.CUSTOM
                 )}
               >
                 Custom
@@ -193,9 +201,10 @@ function Content() {
                   type="radio"
                   name={SIMULATIONS_RADIO}
                   id="custom-simulationsRadio"
-                  value={NumberOfSimulations.CUSTOM}
+                  value={NumberOfSimulationsValue.CUSTOM}
                   checked={
-                    numberOfSimulationsType === NumberOfSimulations.CUSTOM
+                    numberOfSimulationsType.type ===
+                    NumberOfSimulationsValue.CUSTOM
                   }
                   onChange={handleChange}
                 />
@@ -209,7 +218,8 @@ function Content() {
                 "text-sm text-gray-600 inline-block transition-opacity",
                 {
                   "opacity-50":
-                    numberOfSimulationsType !== NumberOfSimulations.CUSTOM,
+                    numberOfSimulationsType.type !==
+                    NumberOfSimulationsValue.CUSTOM,
                 }
               )}
             >
@@ -217,7 +227,9 @@ function Content() {
             </span>
             <input
               className="underlined-input mb-6"
-              disabled={numberOfSimulationsType !== NumberOfSimulations.CUSTOM}
+              disabled={
+                numberOfSimulationsType.type !== NumberOfSimulationsValue.CUSTOM
+              }
               type="number"
               name={SIMULATIONS_NUMBER}
               min={0}
@@ -230,34 +242,28 @@ function Content() {
 
           <h2 className="body-header-mb">Stick or Swap</h2>
 
-          <label
-            htmlFor="stick"
-            className={buttonClass(strategy === Strategy.STICK)}
-          >
+          <label htmlFor="stick" className={buttonClass(strategy === STICK)}>
             Stick
             <input
               className="hidden-input"
               type="radio"
               name={STRATEGY_RADIO}
               id="stick"
-              value={Strategy.STICK}
-              checked={strategy === Strategy.STICK}
+              value={STICK}
+              checked={strategy === STICK}
               onChange={handleChange}
             />
           </label>
 
-          <label
-            htmlFor="swap"
-            className={buttonClass(strategy === Strategy.SWAP)}
-          >
+          <label htmlFor="swap" className={buttonClass(strategy === SWAP)}>
             Swap
             <input
               className="hidden-input"
               type="radio"
               name={STRATEGY_RADIO}
               id="swap"
-              value={Strategy.SWAP}
-              checked={strategy === Strategy.SWAP}
+              value={SWAP}
+              checked={strategy === SWAP}
               onChange={handleChange}
             />
           </label>
