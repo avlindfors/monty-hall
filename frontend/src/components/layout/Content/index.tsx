@@ -6,14 +6,14 @@ import HttpMethod from "../../../enums/HttpMethod";
 import ErrorObject from "../../../api/ErrorObject";
 
 enum Strategy {
-  STICK = 'STICK',
-  SWAP = 'SWAP',
+  STICK = "STICK",
+  SWAP = "SWAP",
 }
 
 enum NumberOfSimulations {
-  ONE = 'ONE',
-  TEN_THOUSAND = 'TEN_THOUSAND',
-  CUSTOM = 'CUSTOM',
+  ONE = "ONE",
+  TEN_THOUSAND = "TEN_THOUSAND",
+  CUSTOM = "CUSTOM",
 }
 
 interface SimulationResultType {
@@ -22,6 +22,10 @@ interface SimulationResultType {
 }
 
 const DEFAULT_CUSTOM_NUMBER_OF_SIMULATIONS = 25000;
+
+const SIMULATIONS_RADIO = "numberOfSimulationsRadio";
+const SIMULATIONS_NUMBER = "numberOfSimulations";
+const STRATEGY_RADIO = "strategy-swap-radio";
 
 function Content() {
   const [simulationResult, setSimulationResult] = useState<
@@ -32,22 +36,25 @@ function Content() {
     undefined
   );
 
-  const handleError = (errorObject : ErrorObject) => {
+  const handleError = (errorObject: ErrorObject) => {
     setPostError(errorObject);
     setSimulationResult(undefined);
-  }
+  };
 
-  const [numberOfSimulationsType, setNumberOfSimulationsType] = useState<
-    string
-  >(NumberOfSimulations.CUSTOM);
+  const [
+    numberOfSimulationsType,
+    setNumberOfSimulationsType,
+  ] = useState<string>(NumberOfSimulations.CUSTOM);
 
-  const [fixedNumberOfSimulations, setFixedNumberOfSimulations] = useState<
-    number
-  >(1);
+  const [
+    fixedNumberOfSimulations,
+    setFixedNumberOfSimulations,
+  ] = useState<number>(1);
 
-  const [customNumberOfSimulations, setCustomNumberOfSimulations] = useState<
-    any
-  >(DEFAULT_CUSTOM_NUMBER_OF_SIMULATIONS);
+  const [
+    customNumberOfSimulations,
+    setCustomNumberOfSimulations,
+  ] = useState<any>(DEFAULT_CUSTOM_NUMBER_OF_SIMULATIONS);
 
   const [strategy, setStrategy] = useState(Strategy.STICK);
 
@@ -56,7 +63,7 @@ function Content() {
     if (numberOfSimulationsType === NumberOfSimulations.CUSTOM) {
       actualNumberOfSimulations = customNumberOfSimulations;
     } else {
-      actualNumberOfSimulations = fixedNumberOfSimulations;
+      actualNumberOfSimulations = getFixedNumberOfSimulations();
     }
     setPostError(undefined);
     performCall({
@@ -66,49 +73,34 @@ function Content() {
     e.preventDefault();
   };
 
-  const handleNumberOfSimulationsChange = (event: SyntheticEvent) => {
-    const target = event.target as HTMLInputElement;
-    const numberOfSimulationsType = target.value;
+  const getFixedNumberOfSimulations = () => {
     switch (numberOfSimulationsType) {
       case NumberOfSimulations.ONE:
-        setFixedNumberOfSimulations(1);
-        break;
+        return 1;
       case NumberOfSimulations.TEN_THOUSAND:
-        setFixedNumberOfSimulations(10000);
-        break;
+        return 10000;
       default:
-        setFixedNumberOfSimulations(1);
-        break;
+        return 1;
     }
-    setNumberOfSimulationsType(numberOfSimulationsType);
   };
 
   const handleChange = (event: SyntheticEvent) => {
     const target = event.target as HTMLInputElement;
-    switch (target.type) {
-      case 'radio':
-        handleRadioUpdate(target);
+    const { name, value } = target;
+    switch (name) {
+      case SIMULATIONS_RADIO:
+        setNumberOfSimulationsType(value);
         break;
-      case 'number':
-        handleNumberUpdate(target);
+      case SIMULATIONS_NUMBER:
+        setCustomNumberOfSimulations(parseInt(value));
         break;
-      default:
-        throw new Error('Can not handle inputs of type: ' + target.type);
+      case STRATEGY_RADIO:
+        if (value === Strategy.STICK) {
+          setStrategy(Strategy.STICK);
+        } else {
+          setStrategy(Strategy.SWAP);
+        }
     }
-  };
-
-  const handleRadioUpdate = (element: HTMLInputElement) => {
-    const { value } = element;
-    if (value === Strategy.STICK) {
-      setStrategy(Strategy.STICK);
-    } else {
-      setStrategy(Strategy.SWAP);
-    }
-  };
-
-  const handleNumberUpdate = (element: HTMLInputElement) => {
-    const { value } = element;
-    setCustomNumberOfSimulations(parseInt(value));
   };
 
   const { isLoading, performCall } = useAxios({
@@ -127,8 +119,8 @@ function Content() {
     simulationResult.totalWins >= simulationResult.totalSimulations / 2;
 
   const buttonClass = (isSelected: boolean) => {
-    return classnames('hollow-checkbox', {
-      'border-gray-700': isSelected,
+    return classnames("hollow-checkbox", {
+      "border-gray-700": isSelected,
     });
   };
 
@@ -157,11 +149,11 @@ function Content() {
                 <input
                   className="hidden-input"
                   type="radio"
-                  name="numberOfSimulationsRadio"
+                  name={SIMULATIONS_RADIO}
                   id="1-simulationsRadio"
                   value={NumberOfSimulations.ONE}
                   checked={numberOfSimulationsType === NumberOfSimulations.ONE}
-                  onChange={handleNumberOfSimulationsChange}
+                  onChange={handleChange}
                 />
               </label>
             </div>
@@ -177,13 +169,13 @@ function Content() {
                 <input
                   className="hidden-input"
                   type="radio"
-                  name="numberOfSimulationsRadio"
+                  name={SIMULATIONS_RADIO}
                   id="10000-simulationsRadio"
                   value={NumberOfSimulations.TEN_THOUSAND}
                   checked={
                     numberOfSimulationsType === NumberOfSimulations.TEN_THOUSAND
                   }
-                  onChange={handleNumberOfSimulationsChange}
+                  onChange={handleChange}
                 />
               </label>
             </div>
@@ -199,13 +191,13 @@ function Content() {
                 <input
                   className="hidden-input"
                   type="radio"
-                  name="numberOfSimulationsRadio"
+                  name={SIMULATIONS_RADIO}
                   id="custom-simulationsRadio"
                   value={NumberOfSimulations.CUSTOM}
                   checked={
                     numberOfSimulationsType === NumberOfSimulations.CUSTOM
                   }
-                  onChange={handleNumberOfSimulationsChange}
+                  onChange={handleChange}
                 />
               </label>
             </div>
@@ -214,9 +206,9 @@ function Content() {
           <label>
             <span
               className={classnames(
-                'text-sm text-gray-600 inline-block transition-opacity',
+                "text-sm text-gray-600 inline-block transition-opacity",
                 {
-                  'opacity-50':
+                  "opacity-50":
                     numberOfSimulationsType !== NumberOfSimulations.CUSTOM,
                 }
               )}
@@ -227,7 +219,7 @@ function Content() {
               className="underlined-input mb-6"
               disabled={numberOfSimulationsType !== NumberOfSimulations.CUSTOM}
               type="number"
-              name="numberOfSimulations"
+              name={SIMULATIONS_NUMBER}
               min={0}
               value={customNumberOfSimulations}
               placeholder=""
@@ -246,7 +238,7 @@ function Content() {
             <input
               className="hidden-input"
               type="radio"
-              name="strategy-stick-radio"
+              name={STRATEGY_RADIO}
               id="stick"
               value={Strategy.STICK}
               checked={strategy === Strategy.STICK}
@@ -262,7 +254,7 @@ function Content() {
             <input
               className="hidden-input"
               type="radio"
-              name="strategy-swap-radio"
+              name={STRATEGY_RADIO}
               id="swap"
               value={Strategy.SWAP}
               checked={strategy === Strategy.SWAP}
@@ -275,10 +267,14 @@ function Content() {
             disabled={isFormInvalid || isLoading}
             className="submit-button"
           ></input>
-          <div className={classnames("pt-4 text-xs",{
-            hidden: !postError
-          })}>
-            {postError && <p className="text-red-500">{postError.description}</p>}
+          <div
+            className={classnames("pt-4 text-xs", {
+              hidden: !postError,
+            })}
+          >
+            {postError && (
+              <p className="text-red-500">{postError.description}</p>
+            )}
           </div>
         </form>
         <div className="text-gray-700 text-sm w-full text-center bg-white py-5 px-1">
