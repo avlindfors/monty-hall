@@ -1,13 +1,9 @@
 package com.avlindfors.montyhall.service;
 
 import static com.avlindfors.montyhall.domain.api.Strategy.STICK;
-import static com.avlindfors.montyhall.domain.game.Result.WIN;
 
 import com.avlindfors.montyhall.domain.api.SimulationRequest;
 import com.avlindfors.montyhall.domain.api.SimulationResponse;
-import com.avlindfors.montyhall.domain.game.Game;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,26 +25,21 @@ public class SimulationService {
     var strategy = request.getStickOrSwapStrategy();
 
     int totalWins = 0;
-
     for (int i = 0; i < numberOfSimulations; i++) {
-      // Start a new game
-      Game game = new Game(strategy);
-      gameManagerService.startGame(game);
-      // Pick your door
-      gameManagerService.pickADoor(game);
-      // End early if strategy is to STICK
+      // Start a new abstraction of a game round
+      // Randomly position the car between 3 possible positions
+      int carDoor =  gameManagerService.getRandomDoorIndex();
+      // Randomly pick a door between 3 possible positions
+      int pickedDoor = gameManagerService.getRandomDoorIndex();
+      // At this point in the game we know if we are going to be correct or not
       if (strategy.equals(STICK)) {
-        if (game.isCurrentPickCorrect()) {
+        if (carDoor == pickedDoor) {
           totalWins++;
         }
-        continue;
-      }
-      // Reveal prize behind one door
-      gameManagerService.openOneDoor(game);
-      // Determine win condition
-      gameManagerService.endGame(game);
-      if (game.getGameResult().equals(WIN)) {
-        totalWins++;
+      } else {
+        if(carDoor != pickedDoor) {
+          totalWins++;
+        }
       }
     }
 

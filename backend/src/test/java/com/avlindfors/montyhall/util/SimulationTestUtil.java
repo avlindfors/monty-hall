@@ -11,5 +11,4 @@ public class SimulationTestUtil {
         .withStickOrSwapStrategy(strategy)
         .build();
   }
-
 }

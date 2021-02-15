@@ -2,17 +2,15 @@ package com.avlindfors.montyhall.domain.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @JsonDeserialize(builder = SimulationRequest.Builder.class)
 public class SimulationRequest {
 
   @NotNull
-  @Min(1)
-  @Max(Integer.MAX_VALUE)
+  @Range(min = 1, max = 1000000000)
   private final Integer numberOfSimulations;
 
   @NotNull

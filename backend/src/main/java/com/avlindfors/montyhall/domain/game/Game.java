@@ -1,6 +1,5 @@
 package com.avlindfors.montyhall.domain.game;
 
-import static com.avlindfors.montyhall.domain.api.Strategy.SWAP;
 import static com.avlindfors.montyhall.domain.game.Prize.CAR;
 
 import com.avlindfors.montyhall.domain.api.Strategy;

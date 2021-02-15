@@ -41,8 +41,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
    * Handle {@link RuntimeException} and create error object.
    */
   @ExceptionHandler(value = RuntimeException.class)
-  public ResponseEntity<Object> handleRuntimeException(RuntimeException e, HttpHeaders headers,
-      HttpStatus status, WebRequest request) {
+  public ResponseEntity<Object> handleRuntimeException(RuntimeException e, WebRequest request) {
     ErrorObject errorData = createErrorData(INTERNAL_SERVER_ERROR, e.getMessage());
     return handleExceptionInternal(e, errorData, new HttpHeaders(),
         HttpStatus.INTERNAL_SERVER_ERROR, request);

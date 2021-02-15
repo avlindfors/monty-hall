@@ -45,7 +45,7 @@ public class GameManagerService {
    * @param game with current state.
    * @return updated game state
    */
-  public Game pickADoor(Game game) {
+  public Game pickDoor(Game game) {
     int pickedDoor = getRandomDoorIndex();
     game.setInitialPickIndex(pickedDoor);
     return game;
@@ -91,7 +91,10 @@ public class GameManagerService {
     return game;
   }
 
-  private int getRandomDoorIndex() {
+  /**
+   * Creates an index to represent the position of one of the doors.
+   */
+  public int getRandomDoorIndex() {
     return generateRandomInt(0, NUMBER_OF_DOORS);
   }
 
