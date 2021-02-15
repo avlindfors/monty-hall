@@ -1,7 +1,9 @@
-import React, { SyntheticEvent, useState } from 'react';
-import classnames from 'classnames';
-import useAxios from '../../../hooks/useAxios';
-import HttpMethod from '../../../enums/HttpMethod';
+import React, { SyntheticEvent, useState } from "react";
+import classnames from "classnames";
+
+import useAxios from "../../../hooks/useAxios";
+import HttpMethod from "../../../enums/HttpMethod";
+import ErrorObject from "../../../api/ErrorObject";
 
 enum Strategy {
   STICK = 'STICK',
@@ -26,11 +28,14 @@ function Content() {
     SimulationResultType | undefined
   >(undefined);
 
-  const { response, isLoading, error, performCall } = useAxios({
-    url: '/api/v1/simulate',
-    method: HttpMethod.POST,
-    onResponse: setSimulationResult,
-  });
+  const [postError, setPostError] = useState<ErrorObject | undefined>(
+    undefined
+  );
+
+  const handleError = (errorObject : ErrorObject) => {
+    setPostError(errorObject);
+    setSimulationResult(undefined);
+  }
 
   const [numberOfSimulationsType, setNumberOfSimulationsType] = useState<
     string
@@ -53,6 +58,7 @@ function Content() {
     } else {
       actualNumberOfSimulations = fixedNumberOfSimulations;
     }
+    setPostError(undefined);
     performCall({
       numberOfSimulations: actualNumberOfSimulations,
       stickOrSwapStrategy: strategy,
@@ -101,14 +107,20 @@ function Content() {
   };
 
   const handleNumberUpdate = (element: HTMLInputElement) => {
-    setCustomNumberOfSimulations(element.value);
+    const { value } = element;
+    setCustomNumberOfSimulations(parseInt(value));
   };
 
-  const isFormValid: boolean =
-    (numberOfSimulationsType === NumberOfSimulations.CUSTOM &&
-      !isNaN(customNumberOfSimulations)) ||
-    numberOfSimulationsType === NumberOfSimulations.ONE ||
-    numberOfSimulationsType === NumberOfSimulations.TEN_THOUSAND;
+  const { isLoading, performCall } = useAxios({
+    url: "/api/v1/simulate",
+    method: HttpMethod.POST,
+    onResponse: setSimulationResult,
+    onError: handleError,
+  });
+
+  const isFormInvalid: boolean =
+    isNaN(customNumberOfSimulations) &&
+    numberOfSimulationsType === NumberOfSimulations.CUSTOM;
 
   const madeTheRightChoice =
     simulationResult !== undefined &&
@@ -259,10 +271,15 @@ function Content() {
           </label>
           <input
             type="submit"
-            value={!isLoading ? 'Simulate' : 'Simulating'}
-            disabled={!isFormValid || isLoading}
+            value={!isLoading ? "Simulate" : "Simulating"}
+            disabled={isFormInvalid || isLoading}
             className="submit-button"
           ></input>
+          <div className={classnames("pt-4 text-xs",{
+            hidden: !postError
+          })}>
+            {postError && <p className="text-red-500">{postError.description}</p>}
+          </div>
         </form>
         <div className="text-gray-700 text-sm w-full text-center bg-white py-5 px-1">
           {!simulationResult ? (

@@ -1,6 +1,6 @@
 interface ErrorObject {
   description: string;
-  errorCode: string | undefined;
+  code: string | undefined;
 }
 
 export default ErrorObject;

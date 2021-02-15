@@ -27,9 +27,9 @@ const BASE_URL = isProduction ? HOST_PORT : "";
 
 const axiosConfig = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 15000,
   timeoutErrorMessage:
-    "Could not connect to server before timeout. Please try again.",
+    "Could not connect to server before timeout.",
 });
 
 function useAxios({
@@ -63,26 +63,18 @@ function useAxios({
         }
       })
       .catch((error: AxiosError) => {
-        if (error.request !== undefined) {
-          const errorObject: ErrorObject = {
-            errorCode: error.code,
-            description: error.message,
-          };
-          console.error(errorObject)
-          setError(errorObject);
-        } else if (error.response !== undefined) {
-          const errorObject = error.response?.data as ErrorObject;
-          console.error(errorObject)
-          setError(errorObject);
-        } else {
-          const errorObject: ErrorObject = {
-            errorCode: error.code,
-            description: error.message,
-          };
-          setError(errorObject);
+        const {code = "NETWORK_ERROR"} = error;
+        let errorObject : ErrorObject = {
+          code: code,
+          description: error.message
+        };
+        // Fångar upp felobjekt som skickas från backend
+        if (error.response !== undefined && error.response?.data !== null) {
+          errorObject = error.response?.data as ErrorObject;
         }
+        setError(errorObject);
         if (onError !== undefined) {
-          onError(error);
+          onError(errorObject);
         }
       })
       .finally(() => {
