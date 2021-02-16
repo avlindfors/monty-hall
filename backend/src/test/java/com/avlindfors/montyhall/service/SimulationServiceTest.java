@@ -9,6 +9,7 @@ import static org.mockito.Mockito.doReturn;
 import com.avlindfors.montyhall.domain.api.SimulationRequest;
 import com.avlindfors.montyhall.domain.api.SimulationResponse;
 import com.avlindfors.montyhall.domain.api.Strategy;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -22,32 +23,32 @@ public class SimulationServiceTest {
   }
 
   @Test
+  @DisplayName("win if STICK when first pick is correct")
   public void winOnStickIfFirstPickIsTheCorrectDoor() {
-    // Test that we win if we stick to our choice when our first pick is correct
     setupGame(2, 2);
     SimulationResponse response = createSingleSimulationWithStratey(STICK);
     assertWin(response);
   }
 
   @Test
+  @DisplayName("lose if STICK when first pick is wrong")
   public void loseOnStickIfFirstPickIsNotTheCorrectDoor() {
-    // Test that we lose if we stick to our choice when our first pick is wrong
     setupGame(2, 1);
     SimulationResponse response = createSingleSimulationWithStratey(STICK);
     assertLoss(response);
   }
 
   @Test
+  @DisplayName("win if SWAP when first pick is wrong")
   public void winOnSwapIfFirstPickIsNotTheCorrectDoor() {
-    // Test that we win if we swap our choice when our first pick is wrong
     setupGame(2, 1);
     SimulationResponse response = createSingleSimulationWithStratey(SWAP);
     assertWin(response);
   }
 
   @Test
+  @DisplayName("lose if SWAP when our first pick is correct")
   public void loseOnSwapIfFirstPickIsTheCorrectDoor() {
-    // Test that we lose if we swap our choice when our first pick is correct
     setupGame(2, 2);
     SimulationResponse response = createSingleSimulationWithStratey(SWAP);
     assertLoss(response);
