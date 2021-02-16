@@ -2,6 +2,7 @@ package com.avlindfors.montyhall.service;
 
 import static com.avlindfors.montyhall.domain.api.Strategy.STICK;
 
+import com.avlindfors.montyhall.domain.api.ErrorCode;
 import com.avlindfors.montyhall.domain.api.SimulationRequest;
 import com.avlindfors.montyhall.domain.api.SimulationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +19,14 @@ public class SimulationService {
   }
 
   /**
-   * Simulates given number of rounds och counts results.
+   * Simulates given number of rounds and counts results.
+   * The simulation is an abstraction of the classic Monty Hall game.
    */
   public SimulationResponse simulate(SimulationRequest request) {
     var numberOfSimulations = request.getNumberOfSimulations();
     var strategy = request.getStickOrSwapStrategy();
 
-    boolean useStickStrategy = strategy.equals(STICK);
+    boolean useStickStrategy = strategy == STICK;
     int totalWins = 0;
     for (int i = 0; i < numberOfSimulations; i++) {
       // Randomly position the car between 3 possible positions

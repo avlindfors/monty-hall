@@ -52,8 +52,10 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
    */
   @ExceptionHandler({ConstraintViolationException.class})
   @ResponseStatus(BAD_REQUEST)
-  public ErrorObject handleConstraintViolationException(ConstraintViolationException ex) {
-    return createErrorData(PARAMETER_VALIDATION_ERROR, ex.getMessage());
+  public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex,
+      WebRequest request) {
+    ErrorObject errorData = createErrorData(PARAMETER_VALIDATION_ERROR, ex.getMessage());
+    return handleExceptionInternal(ex, errorData, new HttpHeaders(), BAD_REQUEST, request);
   }
 
   private String createErrorObjectMessage(ObjectError objectError) {

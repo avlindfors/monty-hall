@@ -24,9 +24,7 @@ public class SimulationServiceTest {
   @Test
   public void winOnStickIfFirstPickIsTheCorrectDoor() {
     // Test that we win if we stick to our choice when our first pick is correct
-    doReturn(2)
-        .when(gameManagerService)
-        .getRandomDoorIndex();
+    setupGame(2, 2);
     SimulationResponse response = createSingleSimulationWithStratey(STICK);
     assertWin(response);
   }
@@ -34,10 +32,7 @@ public class SimulationServiceTest {
   @Test
   public void loseOnStickIfFirstPickIsNotTheCorrectDoor() {
     // Test that we lose if we stick to our choice when our first pick is wrong
-    doReturn(2)
-        .doReturn(1)
-        .when(gameManagerService)
-        .getRandomDoorIndex();
+    setupGame(2, 1);
     SimulationResponse response = createSingleSimulationWithStratey(STICK);
     assertLoss(response);
   }
@@ -45,10 +40,7 @@ public class SimulationServiceTest {
   @Test
   public void winOnSwapIfFirstPickIsNotTheCorrectDoor() {
     // Test that we win if we swap our choice when our first pick is wrong
-    doReturn(2)
-        .doReturn(1)
-        .when(gameManagerService)
-        .getRandomDoorIndex();
+    setupGame(2, 1);
     SimulationResponse response = createSingleSimulationWithStratey(SWAP);
     assertWin(response);
   }
@@ -56,12 +48,21 @@ public class SimulationServiceTest {
   @Test
   public void loseOnSwapIfFirstPickIsTheCorrectDoor() {
     // Test that we lose if we swap our choice when our first pick is correct
-    doReturn(2)
-        .doReturn(2)
-        .when(gameManagerService)
-        .getRandomDoorIndex();
+    setupGame(2, 2);
     SimulationResponse response = createSingleSimulationWithStratey(SWAP);
     assertLoss(response);
+  }
+
+  private void setupGame(int carDoor, int pickedDoor) {
+    doReturn(carDoor)
+        .doReturn(pickedDoor)
+        .when(gameManagerService)
+        .getRandomDoorIndex();
+  }
+
+  private SimulationResponse createSingleSimulationWithStratey(Strategy strategy) {
+    SimulationRequest request = createRequest(1, strategy);
+    return simulationService.simulate(request);
   }
 
   private void assertWin(SimulationResponse response) {
@@ -75,10 +76,5 @@ public class SimulationServiceTest {
   private void assertNumberOfWins(SimulationResponse response, int numberOfWins) {
     assertThat(response.getTotalSimulations()).isEqualTo(1);
     assertThat(response.getTotalWins()).isEqualTo(numberOfWins);
-  }
-
-  private SimulationResponse createSingleSimulationWithStratey(Strategy strategy) {
-    SimulationRequest request = createRequest(1, strategy);
-    return simulationService.simulate(request);
   }
 }
